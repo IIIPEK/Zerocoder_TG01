@@ -35,6 +35,7 @@ async def help(message: Message):
 async def get_city(message: Message):
     keyboard = generate_location_keyboard(locations)
     await message.answer("Выберите город:", reply_markup=keyboard)
+    await message.delete()
 
 
 @dp.callback_query(lambda c: c.data.startswith("city:"))
@@ -50,7 +51,7 @@ async def location_selected(callback: CallbackQuery):
                                      f"🌤 {weather['description'].capitalize()}\n"
                                      f"🌡 Температура: {round(weather['temp'])}°C (ощущается как {round(weather['feels_like'])}°C)\n"
                                      f"💧 Влажность: {weather['humidity']}%\n"
-                                     f"🔽 Давление: {weather['pressure']*0.750062} мм рт. ст.\n"
+                                     f"🔽 Давление: {round(weather['pressure']*0.750062,1)} мм рт. ст.\n"
                                      f"💨 Ветер: {weather['wind']} м/с",
                                      parse_mode="HTML")
 

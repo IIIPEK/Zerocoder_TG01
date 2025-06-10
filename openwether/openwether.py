@@ -12,7 +12,7 @@ async def get_weather(location):
     try:
         async with httpx.AsyncClient() as client:
             url=f'{API_URL}?q={location}&lang=ru&units=metric&appid={API_KEY}'
-            print(url)
+            #print(url)
             response = await client.get(url)
         data = response.json()
         result = {
