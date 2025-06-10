@@ -1,14 +1,19 @@
 import os
-import requests
+import httpx
 from dotenv import load_dotenv
 
+load_dotenv()
 locations = ['Москва', 'Санкт-Петербург', 'Владивосток', 'Новосибирск', 'Екатеринбург', 'Краснодар', 'Иркутск', 'Тюмень']
-API_URL = os.getenv('API_URL')
-API_KEY = os.getenv('API_KEY')
 
-def get_weather(location):
+
+async def get_weather(location):
+    API_URL = os.getenv('API_URL')
+    API_KEY = os.getenv('API_KEY')
     try:
-        response = requests.get(f'{API_URL}?q={location}&lang=ru&lang=ru&units=metric&appid=f3086e5e46acaa901b7820c6911993ca')
+        async with httpx.AsyncClient() as client:
+            url=f'{API_URL}?q={location}&lang=ru&units=metric&appid={API_KEY}'
+            print(url)
+            response = await client.get(url)
         data = response.json()
         result = {
             'city': data['name'],
@@ -20,6 +25,6 @@ def get_weather(location):
             'pressure': data['main']['pressure'],
         }
         return result
-    except requests.exceptions.RequestException as e:
+    except httpx.RequestError as e:
         print(f"Произошла ошибка при выполнении запроса: {e}")
         return None

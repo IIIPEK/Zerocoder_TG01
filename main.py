@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 from openwether import get_weather, locations
 from utils.design import generate_location_keyboard
 
-locations = ['Москва', 'Санкт-Петербург', 'Владивосток', 'Новосибирск', 'Екатеринбург', 'Краснодар', 'Иркутск', 'Тюмень']
+locations = ['Москва', 'Санкт-Петербург', 'Владивосток', 'Новосибирск', 'Екатеринбург', 'Краснодар', 'Иркутск',
+             'Тюмень']
 
 load_dotenv()
 TOKEN = os.getenv('TOKEN')
@@ -16,9 +17,11 @@ TOKEN = os.getenv('TOKEN')
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
+
 @dp.message(CommandStart())
 async def start(message: Message):
     await message.answer('Привет! Я бот для обучения Aiogram')
+
 
 @dp.message(Command('help'))
 async def help(message: Message):
@@ -27,21 +30,35 @@ async def help(message: Message):
                          '/weather - узнать погоду в указанном городе\n'
                          '/help - вывести справку')
 
+
 @dp.message(Command('weather'))
-async def get_weather(message: Message):
+async def get_city(message: Message):
     keyboard = generate_location_keyboard(locations)
     await message.answer("Выберите город:", reply_markup=keyboard)
+
 
 @dp.callback_query(lambda c: c.data.startswith("city:"))
 async def location_selected(callback: CallbackQuery):
     city = callback.data.split(":", 1)[1]
-    await callback.message.edit_text(f"Вы выбрали город: {city}")
+    weather = await get_weather(city)
+
+    if not weather:
+        await callback.message.edit_text(f"Не удалось получить данные о погоде для города {city}")
+        return
+
+    await callback.message.edit_text(f"📍 <b>{weather['city']}</b>\n"
+                                     f"🌤 {weather['description'].capitalize()}\n"
+                                     f"🌡 Температура: {round(weather['temp'])}°C (ощущается как {round(weather['feels_like'])}°C)\n"
+                                     f"💧 Влажность: {weather['humidity']}%\n"
+                                     f"🔽 Давление: {weather['pressure']*0.750062} мм рт. ст.\n"
+                                     f"💨 Ветер: {weather['wind']} м/с",
+                                     parse_mode="HTML")
+
     await callback.answer()  # убираем "часики"
 
 
 async def main():
     await dp.start_polling(bot)
-
 
 
 if __name__ == '__main__':
