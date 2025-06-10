@@ -1,5 +1,6 @@
 import asyncio
 import os
+from random import random
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command, CommandStart
@@ -56,6 +57,13 @@ async def location_selected(callback: CallbackQuery):
                                      parse_mode="HTML")
 
     await callback.answer()  # убираем "часики"
+
+@dp.message(F.photo)
+async def react_photo(message: Message):
+    list = ['Ого, какая фотка!', 'Непонятно, что это такое', 'Не отправляй мне такое больше']
+    rand_answ = random.choice(list)
+    await message.answer(rand_answ)
+
 
 
 async def main():
