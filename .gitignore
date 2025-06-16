@@ -64,4 +64,5 @@ junit-*.xml
 # Docker / CI
 *.pid
 docker-compose.override.yml
+img/
 

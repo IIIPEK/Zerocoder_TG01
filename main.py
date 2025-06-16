@@ -85,7 +85,8 @@ async def save_photo(message: Message):
     os.makedirs("img", exist_ok=True)  # создаём папку при необходимости
     photo = message.photo[-1]  # берём максимальное качество
     file_path = f"img/{photo.file_id}.jpg"
-    await photo.download(destination=file_path)
+    file = await bot.get_file(file_id=photo.file_id)
+    await bot.download_file(file_path=file.file_path, destination=file_path)
     await message.answer("Фото сохранено ✅")
 
 
